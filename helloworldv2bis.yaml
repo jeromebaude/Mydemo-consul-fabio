@@ -1,0 +1,45 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: hellov2
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: hello
+        version: v2
+    spec:
+      containers:
+      - name: hello
+        image: wardviaene/http-echo
+        env:
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: TEXT
+          value: "hello world from POD $(MY_POD_NAME) This is the UPDATED V2 version !!!\n"
+        ports:
+        - name: http
+          containerPort: 8080
+      initContainers:
+      - name: registerconsul
+        image: jeromebaude/registerconsul
+        env:
+        - name: SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: HOST_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: PORT
+          value: "8080"
+        - name: URL_PREFIX
+          value: "urlprefix-hellov2.com/"  

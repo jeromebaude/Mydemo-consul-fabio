@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-servicev2
+  annotations:
+    consul.hashicorp.com/service-tags: "urlprefix-hello.com"
+    consul.hashicorp.com/service-sync: "true"
+    consul.hashicorp.com/service-name: "hello"
+  labels:
+    app: hello
+spec:
+  selector:
+    app: hello
+    version: v2
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080

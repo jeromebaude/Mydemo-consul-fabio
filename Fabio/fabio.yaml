@@ -1,0 +1,49 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: fabio
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: fabio
+    spec:
+      containers:
+      - name: fabio
+        image: fabiolb/fabio
+        volumeMounts:
+        - mountPath: /etc/fabio
+          name: fabio
+        ports:
+        - name: http
+          containerPort: 9999
+        - name: ui
+          containerPort: 9998
+      volumes:
+      - name: fabio
+        hostPath:
+          # directory location on host
+          path: /etc/fabio
+          # this field is optional
+          type: Directory
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fabio
+  labels:
+    app: fabio
+spec:
+  type: NodePort
+  selector:
+    app: fabio
+  ports:
+  - name: http
+    port: 9999
+    nodePort: 32080
+    targetPort: 9999
+  - name: ui
+    port: 9998
+    nodePort: 32081
+---
